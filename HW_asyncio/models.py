@@ -4,18 +4,20 @@ from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy import Integer, Column, String
 
 
-PG_DSN = "postgresql+asyncpg://user:1234@127.0.0.1:5431/SWAPI"
+PG_DSN = "postgresql+asyncpg://user:1234@127.0.0.1:5431/netology"
 engine = create_async_engine(PG_DSN)
 Base = declarative_base()
 Session = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 
 class SwapiPeople(Base):
-    __tablename__ = "SWAPI"
+    __tablename__ = "swapi"
+
 
     id = Column(Integer, primary_key=True)
     birth_year = Column(String)
     eye_color = Column(String)
+    hair_color = Column(String)
     films = Column(String)
     gender = Column(String)
     height = Column(String)

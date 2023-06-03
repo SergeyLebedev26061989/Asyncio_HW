@@ -10,13 +10,14 @@ async def get_people(page):
     async with aiohttp.ClientSession() as session:
         response = await session.get(f'https://swapi.dev/api/people/?page{page}')
         json_data = await response.json()
-        # await session.close()
     return json_data['results']
+
 
 async def per_data(session, url):
     async with session.get(url) as res:
         data = await res.json()
         return data
+
 
 async def get_films(session, films):
     data_films = await asyncio.gather(
@@ -24,11 +25,13 @@ async def get_films(session, films):
     )
     return ','.join([data_film['title'] for data_film in data_films])
 
+
 async def get_species(session, species):
     data_species = await asyncio.gather(
         *[per_data(session, species_url) for species_url in species]
     )
     return ','.join([data_species['name'] for data_species in data_species])
+
 
 async def get_starships(session, starships):
     data_starships = await asyncio.gather(
@@ -36,17 +39,20 @@ async def get_starships(session, starships):
     )
     return ','.join([data_starship['name'] for data_starship in data_starships])
 
+
 async def get_vehicles(session, vehicles):
     data_vehicles = await asyncio.gather(
         *[per_data(session, vehicles_url) for vehicles_url in vehicles]
     )
     return ','.join([data_vehicle['name'] for data_vehicle in data_vehicles])
 
+
 async def get_homeworld(session, homeworld):
     data_homeworld = await asyncio.gather(
         per_data(session, homeworld)
     )
     return data_homeworld[0]['name']
+
 
 async def paste_to_db(persons_jsons):
     async with Session() as session:
@@ -76,7 +82,7 @@ async def paste_to_db(persons_jsons):
                 objects.append(object)
                 print('добавлен герой ', object.name)
                 print('из мира ', object.homeworld)
-                print('из фильмов ', object.films)
+                print('из фильма(-ов) ', object.films)
 
         async with Session() as db_session:
             db_session.add_all(objects)
@@ -85,7 +91,7 @@ async def paste_to_db(persons_jsons):
 async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.create_all)
+        await conn.run_sync(Base.metadata.create_all)
         await conn.commit()
 
     pages = requests.get('https://swapi.dev/api/people/').json()['count'] // 10 + 1
